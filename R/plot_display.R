@@ -1,0 +1,97 @@
+#' @title Read MS data in mzXML format.
+#' @description Read MS data in mzXML format.
+#' @details Input a file path of mzXML format, then return a data set. The mzXML format file can be transformed wi MSConvert software.
+#' @param filepath A string of mzXML file location.
+#' @return A list.
+#' @export
+#' @import readMzXmlData
+data_read_mzXML <- function(filepath){
+  #readMzXmlFile from readMzXmlData lib
+  mzXML_mass_inten <- readMzXmlFile(filepath)
+
+  return(mzXML)
+}
+
+#' @title Plot MS2 spectrum with b, y ions.
+#' @description Plot MS2 spectrum with b, y ions.
+#' @details Input a mzXML from data_read_mzXML function and scan number and peptide sequence, then return a list of ggplot objects.
+#' @param mzXML A data set from data_read_mzXML function.
+#' @param scan_num A integer.
+#' @param pep_seq A string of peptide sequence.
+#' @param threshold A integer of mz error with defalut .5.
+#' @return A list of ggplot2 object.
+#' @export
+#' @import ggplot2
+#' @import ggrepel
+#' @import dplyr
+data_ms2_by_plot <- function(mzXML, scan_num, pep_seq = '', threshold = .5){
+  df_mass_inten <- data.frame(mzXML_mass_inten[[scan_num]][1])
+  colnames(df_mass_inten) <- c('mass','intensity')
+
+  if(pep_seq == ''){
+    #ggplot from ggplot2 lib
+    #ggrepel from ggrepel lib
+    p <- ggplot(df_mass_inten, aes(x=mass,y=intensity))+geom_segment(aes(xend=mass,yend=0),size=1.25)
+    p <- p + xlab('m/z') + ylab('Intensity') + theme_bw() + theme(axis.title = element_text(size=15),legend.position = 'none')
+
+    return(p)
+  }
+
+  if(pep_seq != ''){
+    df_ions <- calculate_byions(pep_seq=pep_seq)
+
+    for (t in rownames(df_ions)){
+      temp <- df_mass_inten
+      temp$deltamass <- abs(temp$mass - df_ions[t,'mz'])
+      temp <- temp[order(temp$deltamass),]
+
+      if (temp$deltamass[1] < threshold){
+        df_mass_inten$ion[(df_mass_inten$mass == (temp$mass[1]))] <- df_ions[t,'ion']
+        df_mass_inten$iontype[(df_mass_inten$mass == (temp$mass[1]))] <- strsplit(df_ions[t,'ion'],split = '')[[1]][1]
+      }
+    }
+    #left_join from dplyr lib
+    ion_list <- left_join(df_ions,df_mass_inten)
+    ion_list$iontype[is.na(ion_list$iontype)] <- '-'
+    print(ion_list)
+    ion_list_clean <- ion_list[!is.na(ion_list$mass),]
+    #ggplot from ggplot2 lib
+    #ggrepel from ggrepel lib
+    p <- ggplot(df_mass_inten, aes(x=mass,y=intensity, color=iontype))+geom_segment(aes(xend=mass,yend=0),size=1.25, alpha=.5)+
+      geom_text_repel(subset(df_mass_inten,(iontype=='b' | iontype=='y')),mapping=aes(label=ion_list_clean[order(ion_list_clean[,3]),2]),size=7,hjust=-.5, vjust= -.5, max.iter = 1e4)
+    p <- p + xlab('m/z') + ylab('Intensity') + theme_bw() + theme(axis.title = element_text(size=15),legend.position = 'none')
+
+    pseq <- data_fragment_plot(pep_seq = pep_seq, ion_list = ion_list)
+
+    return(list(p,pseq))
+  }
+}
+
+data_fragment_plot <- function(pep_seq, ion_list){
+  x <- data.frame(cbind(seq(1,nchar(pep_seq)),rep(1,nchar(pep_seq))))
+  colnames(x) <- c('x','y')
+  p <- ggplot(x,aes(x=x,y=y))+geom_text(aes(label= (strsplit(pep_seq,split = '')[[1]])),size=20,vjust=.5,hjust=.5)+ylim(0,2)
+
+  ion_1 <- ion_list[1:(nrow(ion_list) / 2),]
+  icount <- 1
+  for (i in ion_1[,'iontype']) {
+    if (i != '-') {
+      p <- p + geom_segment(x=(icount - .25),xend=(icount + .55),y=1.2,yend=1.2,size=2,color='indianred1') + geom_segment(x=(icount + .5),xend=(icount + .5),y=1,yend=1.2,size=2,color='indianred1')
+    }
+    icount <- icount + 1
+  }
+
+  ion_2 <- ion_list[(nrow(ion_list) / 2 + 1) : nrow(ion_list),]
+  ion_2 <- rev(ion_2)
+  icount <- 1
+  for (i in ion_1[,'iontype']) {
+    if (i != '-') {
+      p <- p + geom_segment(x=(icount - .525),xend=(icount + .25),y=.8,yend=.8,size=2,color='#7CE3D8') + geom_segment(x=(icount - .5),xend=(icount - .5),y=.8,yend=1,size=2,color='#7CE3D8')
+    }
+    icount <- icount + 1
+  }
+
+  p <- p + theme(axis.title = element_blank(), axis.text = element_blank(), axis.line = element_blank(),axis.ticks = element_blank(),panel.grid = element_blank(),panel.border = element_blank(),panel.background = element_blank())
+
+  return(p)
+}

@@ -1,0 +1,15 @@
+Package: MSPlotcyl
+Type: Package
+Title: MS spectrum plot
+Version: 0.1.0
+Author: Yulin Chen
+Maintainer: Yulin Chen <ychen209@qq.com>
+Description: A package for ms spectrum plot.
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 4.0.0)
+Imports: ggplot2, ggrepel, dplyr, readMzXmlData
+RoxygenNote: 7.1.1
+NeedsCompilation: no
+Packaged: 2021-01-28 10:49:59 UTC; administered

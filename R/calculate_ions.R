@@ -1,0 +1,32 @@
+
+calculate_byions <- function(pep_seq){
+  cal_ion_list <- read.csv('inst/exdata/ion_calculate_list.csv',header = TRUE,encoding = 'UTF-8')
+  rownames(cal_ion_list) <- cal_ion_list[,1]
+  cal_ion_list[,2] <- as.numeric(cal_ion_list[,2])
+  pep_seq_list <- unlist(strsplit(pep_seq,''))
+
+  b_ions <- c(cal_ion_list['Hp',2])
+  y_ions <- c((cal_ion_list['HOH',2] + cal_ion_list['Hp',2]))
+
+  for (i in pep_seq_list) {
+    b_ions <- append(b_ions,(b_ions[(length(b_ions))] + cal_ion_list[i,2]))
+  }
+
+  for (i in rev(pep_seq_list)){
+    y_ions <- append(y_ions,(y_ions[(length(y_ions))] + cal_ion_list[i,2]))
+  }
+
+  b_ions <- b_ions[-1]
+  b_ions <- data.frame(b_ions)
+  b_ions$ion <- paste('b',rownames(b_ions),sep = '')
+  colnames(b_ions) <- c('mz','ion')
+  y_ions <- y_ions[-1]
+  y_ions <- data.frame(y_ions)
+  y_ions$ion <- paste('y',rownames(y_ions),sep = '')
+  colnames(y_ions) <- c('mz','ion')
+  df_ions <- rbind(b_ions,y_ions)
+
+  return(df_ions)
+}
+
+
