@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1612015768766.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2200729062",
+    "id" : "D145E563",
+    "lastKnownWriteTime" : 1612017161,
+    "last_content_update" : 1612017161759,
+    "path" : "D:/YulinChen/ZJU LSI/Lin Lab/R_Packages/MSPlotcyl/R/calculate_ions.R",
+    "project_path" : "R/calculate_ions.R",
+    "properties" : {
+        "cursorPosition" : "3,0",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1612015768054.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3458189692",
+    "id" : "59FB3FB3",
+    "lastKnownWriteTime" : 1612018195,
+    "last_content_update" : 1612018195871,
+    "path" : "D:/YulinChen/ZJU LSI/Lin Lab/R_Packages/MSPlotcyl/R/plot_display.R",
+    "project_path" : "R/plot_display.R",
+    "properties" : {
+        "cursorPosition" : "82,0",
+        "scrollLine" : "64"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
